@@ -1,0 +1,68 @@
+{
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Build project (DEBUG)",
+            "command": "/usr/bin/cmake",
+            "args": [
+                "--build",
+                ".",
+                "--config",
+                "Debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Build project (RELEASE)",
+            "command": "/usr/bin/cmake",
+            "args": [
+                "--build",
+                ".",
+                "--config",
+                "Release"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Clean build directory",
+            "command": "/usr/bin/cmake",
+            "args": [
+                "--build",
+                ".",
+                "--target",
+                "clean"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "none",
+                "isDefault": true
+            }
+        }
+    ],
+    "version": "2.0.0"
+}
