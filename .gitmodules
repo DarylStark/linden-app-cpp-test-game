@@ -1,0 +1,3 @@
+[submodule "dependencies/linden-lib-cpp-framework"]
+	path = dependencies/linden-lib-cpp-framework
+	url = https://github.com/DarylStark/linden-lib-cpp-framework
