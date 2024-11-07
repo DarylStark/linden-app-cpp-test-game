@@ -1,0 +1,13 @@
+AccessModifierOffset: -4
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortLoopsOnASingleLine: false
+BasedOnStyle: Google
+BreakBeforeBraces: Allman
+ColumnLimit: 80
+IndentWidth: 4
+NamespaceIndentation: All
+TabWidth: 4
+UseTab: Never
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 4
