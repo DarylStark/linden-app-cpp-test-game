@@ -8,7 +8,7 @@
             "name": "TestGame - Build and debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/src/Debug/linden-app-cpp-test-game",
+            "program": "${workspaceFolder}/build/Debug/linden-app-cpp-test-game",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/",
