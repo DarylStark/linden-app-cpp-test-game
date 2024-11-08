@@ -11,10 +11,11 @@ int main()
     linden::graphics::SDL2 sdl2;
 
     // Create a window
-    linden::graphics::SDL2Window w =
-        sdl2.create_window("SDL2 Basic Example", {300, 300}, {600, 600});
+    linden::graphics::SDL2Window w = sdl2.create_window(
+        "SDL2 Basic Example", {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED},
+        {1280, 1024});
 
-    SDL_Window* window = w.get_window_handle();
+    SDL_Window* window = w.get_sdl2_window_handle();
 
     // Main loop flag
     bool quit = false;
@@ -22,14 +23,21 @@ int main()
     // Event handler
     SDL_Event e;
 
-    SDL_SetRenderDrawColor(w.get_renderer_handle(), 0, 0x66, 0, 0xff);
-    SDL_RenderClear(w.get_renderer_handle());
+    SDL_SetRenderDrawColor(w.get_renderer()->get_sdl2_renderer_handle(), 0,
+                           0x66, 0, 0xff);
+    SDL_RenderClear(w.get_renderer()->get_sdl2_renderer_handle());
+    SDL_RenderPresent(w.get_renderer()->get_sdl2_renderer_handle());
+
+    // Get information about the window
+    linden::graphics::Size window_size = w.get_window_size();
+    linden::graphics::Size drawable_size = w.get_drawable_size();
+    std::cout << "Window size: " << window_size.width << "x"
+              << window_size.height << std::endl;
+    std::cout << "Drawable size: " << drawable_size.width << "x"
+              << drawable_size.height << std::endl;
 
     while (!quit)
     {
-        linden::utils::ScopedTimer scopedTimer;
-        linden::utils::FrameRateLimiter frameRateLimiter(60);
-
         while (SDL_PollEvent(&e) != 0)
         {
             // User requests quit
@@ -39,8 +47,10 @@ int main()
             }
         }
 
-        // Update screen
-        SDL_RenderPresent(w.get_renderer_handle());
+        linden::graphics::Position window_position = w.get_window_position();
+        std::cout << "Window position: " << window_position.x << "x"
+                  << window_position.y << std::endl;
+        SDL_Delay(10);
     }
 
     return 0;
