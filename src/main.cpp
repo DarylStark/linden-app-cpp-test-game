@@ -11,12 +11,10 @@ int main()
     linden::graphics::SDL2 sdl2;
 
     // Create a window
-    linden::graphics::SDL2Window w = sdl2.create_window(
-        "SDL2 Basic Example", {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED},
-        {800, 800});
+    linden::graphics::SDL2Window w =
+        sdl2.create_window("SDL2 Basic Example", {300, 300}, {600, 600});
 
     SDL_Window* window = w.get_window_handle();
-    SDL_Renderer* renderer = w.get_renderer_handle();
 
     // Main loop flag
     bool quit = false;
@@ -24,10 +22,8 @@ int main()
     // Event handler
     SDL_Event e;
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xff);
-    SDL_RenderClear(renderer);
-    int32_t x = 0;
-    int32_t y = 0;
+    SDL_SetRenderDrawColor(w.get_renderer_handle(), 0, 0x66, 0, 0xff);
+    SDL_RenderClear(w.get_renderer_handle());
 
     while (!quit)
     {
@@ -43,29 +39,9 @@ int main()
             }
         }
 
-        // Clear screen
-        SDL_SetRenderDrawColor(renderer, 0x00, 0x66, 0x00, 0xff);
-        SDL_RenderClear(renderer);
-
-        // Draw a pixel
-        SDL_SetRenderDrawColor(renderer, 0, 0x0, 0, 255);
-        SDL_RenderDrawPoint(renderer, ++x, ++y);
-
-        for (int i = -25; i < 25; i++)
-        {
-            SDL_RenderDrawPoint(renderer, x + i, y - i);
-        }
-
         // Update screen
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(w.get_renderer_handle());
     }
-
-    // Destroy window and renderer
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-
-    // Quit SDL subsystems
-    SDL_Quit();
 
     return 0;
 }
