@@ -36,7 +36,7 @@ int main()
         linden::graphics::Size({151, 211}));
 
     // Create the scene
-    linden::graphics::SDL2TargetTexture scene(*w.get_renderer(), {1920, 300});
+    linden::graphics::SDL2TargetTexture scene(*w.get_renderer(), {5000, 300});
     scene.add_texture(*trees["tree_04"], {0, 0}, trees["tree_04"]->get_size(),
                       {100, 20}, trees["tree_04"]->get_size());
     scene.add_texture(*trees["tree_04"], {0, 0}, trees["tree_04"]->get_size(),
@@ -46,13 +46,18 @@ int main()
     scene.add_texture(*trees["tree_10"], {0, 0}, trees["tree_10"]->get_size(),
                       {542, 60}, trees["tree_10"]->get_size());
 
+    scene.add_texture(*trees["tree_10"], {0, 0}, trees["tree_10"]->get_size(),
+                      {1942, 60}, trees["tree_10"]->get_size());
+    scene.add_texture(*trees["tree_04"], {0, 0}, trees["tree_04"]->get_size(),
+                      {2542, 40}, trees["tree_04"]->get_size());
+
     // Main loop flag
     bool quit = false;
 
     // Event handler
     SDL_Event e;
 
-    int32_t foliage_start_x = 100;
+    int32_t level_start_x = 100;
 
     linden::graphics::Position rotate_center_accelerate = {
         0, car_texture.get_size().height - 1};
@@ -65,6 +70,7 @@ int main()
         .scale = 8};
     int32_t speed = 0;
     uint8_t lane = 0;
+    bool in_rear = false;
 
     while (!quit)
     {
@@ -90,7 +96,7 @@ int main()
                         }
                         break;
                     case SDLK_RIGHT:
-                        speed += 5;
+                        speed += 1;
                         car_options.rotation_center = rotate_center_accelerate;
                         if (speed > 180) speed = 180;
                         car_options.angle = -3;
@@ -100,6 +106,14 @@ int main()
                         break;
                     case SDLK_DOWN:
                         if (speed > 0) lane = 0;
+                        break;
+                    case SDLK_SPACE:
+                        if (speed == 0)
+                        {
+                            in_rear = !in_rear;
+                            std::cout << "in_rear: " << std::boolalpha
+                                      << in_rear << std::endl;
+                        }
                         break;
                     default:
                         break;
@@ -117,16 +131,22 @@ int main()
             }
         }
 
-        foliage_start_x -= speed;
-        if (foliage_start_x > 100)
+        level_start_x -= speed;
+        if (level_start_x > 100)
         {
-            foliage_start_x = 100;
+            level_start_x = 100;
             speed = 0;
         }
         std::cout << speed;
 
         // Clear screen
         w.get_renderer()->clear({0, 0x44, 0, 0xff});
+
+        // Draw the sky
+        SDL_SetRenderDrawColor(w.get_renderer()->get_sdl2_renderer_handle(), 28,
+                               150, 197, 0xff);
+        SDL_Rect air = {0, 0, 1920, 550};
+        SDL_RenderFillRect(w.get_renderer()->get_sdl2_renderer_handle(), &air);
 
         // Draw the road
         SDL_SetRenderDrawColor(w.get_renderer()->get_sdl2_renderer_handle(),
@@ -137,6 +157,9 @@ int main()
         // Draw the lines outside of the road
         SDL_SetRenderDrawColor(w.get_renderer()->get_sdl2_renderer_handle(),
                                0xaa, 0xaa, 0xaa, 0xff);
+        for (uint32_t y = 0; y < 2; y++)
+            SDL_RenderDrawLine(w.get_renderer()->get_sdl2_renderer_handle(), 0,
+                               548 + y, 1920, 548 + y);
         for (uint32_t y = 0; y < 10; y++)
             SDL_RenderDrawLine(w.get_renderer()->get_sdl2_renderer_handle(), 0,
                                760 + y, 1920, 760 + y);
@@ -147,9 +170,26 @@ int main()
             SDL_RenderDrawLine(w.get_renderer()->get_sdl2_renderer_handle(), 0,
                                855 + y, 1920, 855 + y);
 
+        for (uint32_t x = 0; x < 10; x++)
+        {
+            SDL_RenderDrawLine(
+                w.get_renderer()->get_sdl2_renderer_handle(),
+                (car_texture.get_size().width * 8) + 60 + x + level_start_x,
+                760,
+                (car_texture.get_size().width * 8) + -20 + x + level_start_x,
+                770 + 190);
+
+            SDL_RenderDrawLine(
+                w.get_renderer()->get_sdl2_renderer_handle(),
+                (car_texture.get_size().width * 8) + 80 + x + level_start_x,
+                760,
+                (car_texture.get_size().width * 8) + 00 + x + level_start_x,
+                770 + 190);
+        }
+
         // Render the foliage
         w.get_renderer()->render_texture(scene,
-                                         {.position = {foliage_start_x, 440}});
+                                         {.position = {level_start_x, 440}});
 
         // Render the car
         car_options.position.y = 830 - (95 * lane);
