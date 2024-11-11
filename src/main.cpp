@@ -178,14 +178,7 @@ int main()
         w.get_renderer()->clear();
 
         // Set background
-        w.get_renderer()->render_texture(
-            t_bg, {true,
-                   {0, 0},
-                   {w.get_window_size().width, w.get_window_size().height},
-                   0,
-                   {0, 0},
-                   false,
-                   false});
+        w.get_renderer()->render_texture(t_bg);
 
         // Render the texture
         w.get_renderer()->render_texture(t_image, {true,
