@@ -70,6 +70,7 @@ int main()
     rect.h = 120;
     int32_t rot = 0;
     uint32_t speed = 15;
+    uint8_t alpha = 255;
 
     // Define boolean flags for key states
     bool up_pressed = false;
@@ -108,6 +109,23 @@ int main()
                     case SDLK_SPACE:
                         speed *= 3;
                         std::cout << "Speed: " << speed << std::endl;
+                        break;
+                    case SDLK_ESCAPE:
+                        quit = true;
+                        break;
+                    case SDLK_MINUS:
+                        if (alpha > 10)
+                            alpha -= 10;
+                        else
+                            alpha = 0;
+                        t.set_alpha(alpha);
+                        break;
+                    case SDLK_EQUALS:
+                        if (alpha < 255 - 10)
+                            alpha += 10;
+                        else
+                            alpha = 255;
+                        t.set_alpha(alpha);
                         break;
                 }
             }
