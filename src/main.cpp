@@ -35,11 +35,11 @@ int main()
     SDL_Event e;
 
     SDL_Rect rect;
-    rect.x = 0;
-    rect.y = 0;
+    rect.x = w.get_window_size().width / 2;
+    rect.y = w.get_window_size().height / 2;
     rect.w = 348 / 3;
     rect.h = 685 / 3;
-    int32_t rot = 0;
+    double rot = 0;
     uint32_t speed = 15;
     uint8_t alpha = 255;
     uint32_t flash_speed = 500;
@@ -175,19 +175,27 @@ int main()
         }
 
         // Clear screen
-        SDL_RenderClear(w.get_renderer()->get_sdl2_renderer_handle());
+        w.get_renderer()->clear();
 
         // Set background
-        SDL_RenderCopy(w.get_renderer()->get_sdl2_renderer_handle(), texture_bg,
-                       nullptr, nullptr);
+        w.get_renderer()->render_texture(
+            t_bg, {{0, 0},
+                   {w.get_window_size().width, w.get_window_size().height},
+                   0,
+                   {0, 0},
+                   false,
+                   false});
 
         // Render the texture
-        SDL_RenderCopyEx(w.get_renderer()->get_sdl2_renderer_handle(),
-                         t_image.get_sdl2_texture_handle(), nullptr, &rect, rot,
-                         nullptr, SDL_FLIP_NONE);
+        w.get_renderer()->render_texture(t_image, {{rect.x, rect.y},
+                                                   {rect.w, rect.h},
+                                                   rot,
+                                                   {rect.w / 2, rect.h / 2},
+                                                   false,
+                                                   false});
 
         // Render the texture
-        SDL_RenderPresent(w.get_renderer()->get_sdl2_renderer_handle());
+        w.get_renderer()->render();
     }
 
     return 0;
