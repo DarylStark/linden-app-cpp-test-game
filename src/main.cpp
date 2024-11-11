@@ -179,7 +179,8 @@ int main()
 
         // Set background
         w.get_renderer()->render_texture(
-            t_bg, {{0, 0},
+            t_bg, {true,
+                   {0, 0},
                    {w.get_window_size().width, w.get_window_size().height},
                    0,
                    {0, 0},
@@ -187,7 +188,8 @@ int main()
                    false});
 
         // Render the texture
-        w.get_renderer()->render_texture(t_image, {{rect.x, rect.y},
+        w.get_renderer()->render_texture(t_image, {true,
+                                                   {rect.x, rect.y},
                                                    {rect.w, rect.h},
                                                    rot,
                                                    {rect.w / 2, rect.h / 2},
