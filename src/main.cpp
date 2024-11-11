@@ -5,6 +5,7 @@
 #include <linden_utils/frame_rate_limiter.h>
 #include <linden_utils/scoped_timer.h>
 
+#include <array>
 #include <iostream>
 
 int main()
@@ -18,44 +19,79 @@ int main()
 
     SDL_Window* window = w.get_sdl2_window_handle();
 
-    // Create a texture
-    linden::graphics::SDL2StreamingTexture t(*w.get_renderer(), {7, 12});
-    SDL_Texture* texture = t.get_sdl2_texture_handle();
+    // -----------------------------------------------------------
+    // Create a green car
+    linden::graphics::SDL2StreamingTexture t_green(*w.get_renderer(), {7, 12});
+    SDL_Texture* texture_green = t_green.get_sdl2_texture_handle();
 
     // Add data to the texture
-    t.lock();
+    t_green.lock();
 
     // Fill the texture with a simple pattern
     for (int32_t x = 0; x < 7; x++)
     {
         for (int32_t y = 0; y < 12; y++)
         {
-            t.set_pixel({x, y}, {0, 0, 0, 0});
+            t_green.set_pixel({x, y}, {0, 0, 0, 0});
         }
     }
-
-    t.set_pixel({0, 2}, {0, 0x66, 0, 255});
-    t.set_pixel({6, 2}, {0, 0x66, 0, 255});
-    t.set_pixel({0, 3}, {0, 0x66, 0, 255});
-    t.set_pixel({6, 3}, {0, 0x66, 0, 255});
-    t.set_pixel({0, 8}, {0, 0x66, 0, 255});
-    t.set_pixel({6, 8}, {0, 0x66, 0, 255});
-    t.set_pixel({0, 9}, {0, 0x66, 0, 255});
-    t.set_pixel({6, 9}, {0, 0x66, 0, 255});
+    t_green.set_pixel({0, 2}, {0, 0x66, 0, 255});
+    t_green.set_pixel({6, 2}, {0, 0x66, 0, 255});
+    t_green.set_pixel({0, 3}, {0, 0x66, 0, 255});
+    t_green.set_pixel({6, 3}, {0, 0x66, 0, 255});
+    t_green.set_pixel({0, 8}, {0, 0x66, 0, 255});
+    t_green.set_pixel({6, 8}, {0, 0x66, 0, 255});
+    t_green.set_pixel({0, 9}, {0, 0x66, 0, 255});
+    t_green.set_pixel({6, 9}, {0, 0x66, 0, 255});
 
     for (int32_t y = 0; y <= 11; y++)
     {
-        t.set_pixel({1, y}, {0, 0x66, 0, 128});
-        t.set_pixel({2, y}, {0, 0x66, 0, 128});
-        t.set_pixel({3, y}, {0, 0x66, 0, 128});
-        t.set_pixel({4, y}, {0, 0x66, 0, 128});
-        t.set_pixel({5, y}, {0, 0x66, 0, 128});
+        t_green.set_pixel({1, y}, {0, 0x66, 0, 128});
+        t_green.set_pixel({2, y}, {0, 0x66, 0, 128});
+        t_green.set_pixel({3, y}, {0, 0x66, 0, 128});
+        t_green.set_pixel({4, y}, {0, 0x66, 0, 128});
+        t_green.set_pixel({5, y}, {0, 0x66, 0, 128});
     }
+    t_green.set_pixel({1, 0}, {0, 0, 0, 0});
+    t_green.set_pixel({5, 0}, {0, 0, 0, 0});
+    t_green.unlock();
+    // -----------------------------------------------------------
+    // Create a red car
+    linden::graphics::SDL2StreamingTexture t_red(*w.get_renderer(), {7, 12});
+    SDL_Texture* texture_red = t_red.get_sdl2_texture_handle();
 
-    t.set_pixel({1, 0}, {0, 0, 0, 0});
-    t.set_pixel({5, 0}, {0, 0, 0, 0});
+    // Add data to the texture
+    t_red.lock();
 
-    t.unlock();
+    // Fill the texture with a simple pattern
+    for (int32_t x = 0; x < 7; x++)
+    {
+        for (int32_t y = 0; y < 12; y++)
+        {
+            t_red.set_pixel({x, y}, {0, 0, 0, 0});
+        }
+    }
+    t_red.set_pixel({0, 2}, {0xff, 0, 0, 255});
+    t_red.set_pixel({6, 2}, {0xff, 0, 0, 255});
+    t_red.set_pixel({0, 3}, {0xff, 0, 0, 255});
+    t_red.set_pixel({6, 3}, {0xff, 0, 0, 255});
+    t_red.set_pixel({0, 8}, {0xff, 0, 0, 255});
+    t_red.set_pixel({6, 8}, {0xff, 0, 0, 255});
+    t_red.set_pixel({0, 9}, {0xff, 0, 0, 255});
+    t_red.set_pixel({6, 9}, {0xff, 0, 0, 255});
+
+    for (int32_t y = 0; y <= 11; y++)
+    {
+        t_red.set_pixel({1, y}, {0xff, 0, 0, 128});
+        t_red.set_pixel({2, y}, {0xff, 0, 0, 128});
+        t_red.set_pixel({3, y}, {0xff, 0, 0, 128});
+        t_red.set_pixel({4, y}, {0xff, 0, 0, 128});
+        t_red.set_pixel({5, y}, {0xff, 0, 0, 128});
+    }
+    t_red.set_pixel({1, 0}, {0, 0, 0, 0});
+    t_red.set_pixel({5, 0}, {0, 0, 0, 0});
+    t_red.unlock();
+    // -----------------------------------------------------------
 
     // Main loop flag
     bool quit = false;
@@ -71,17 +107,26 @@ int main()
     int32_t rot = 0;
     uint32_t speed = 15;
     uint8_t alpha = 255;
+    uint32_t flash_speed = 500;
 
     // Define boolean flags for key states
     bool up_pressed = false;
     bool down_pressed = false;
     bool left_pressed = false;
     bool right_pressed = false;
+    bool space_pressed = false;
+
+    std::array<linden::graphics::SDL2Texture*, 2> textures = {&t_green, &t_red};
+    uint32_t current_texture = 0;
+
+    auto start = std::chrono::high_resolution_clock::now();
 
     while (!quit)
     {
         linden::utils::ScopedTimer timer;
         linden::utils::FrameRateLimiter limiter(60);
+
+        linden::graphics::SDL2Texture* texture = textures[current_texture % 2];
 
         while (SDL_PollEvent(&e) != 0)
         {
@@ -107,8 +152,13 @@ int main()
                         right_pressed = true;
                         break;
                     case SDLK_SPACE:
-                        speed *= 3;
-                        std::cout << "Speed: " << speed << std::endl;
+                        if (!space_pressed)
+                        {
+                            space_pressed = true;
+                            speed *= 3;
+                            flash_speed /= 5;
+                            std::cout << "DOWWWNNN" << std::endl;
+                        }
                         break;
                     case SDLK_ESCAPE:
                         quit = true;
@@ -118,14 +168,14 @@ int main()
                             alpha -= 10;
                         else
                             alpha = 0;
-                        t.set_alpha(alpha);
+                        texture->set_alpha(alpha);
                         break;
                     case SDLK_EQUALS:
                         if (alpha < 255 - 10)
                             alpha += 10;
                         else
                             alpha = 255;
-                        t.set_alpha(alpha);
+                        texture->set_alpha(alpha);
                         break;
                 }
             }
@@ -147,11 +197,25 @@ int main()
                         right_pressed = false;
                         break;
                     case SDLK_SPACE:
-                        speed /= 3;
-                        std::cout << "Speed: " << speed << std::endl;
+                        if (space_pressed)
+                        {
+                            speed /= 3;
+                            flash_speed *= 5;
+                            std::cout << "UP" << std::endl;
+                            space_pressed = false;
+                        }
                         break;
                 }
             }
+        }
+
+        const auto now = std::chrono::high_resolution_clock::now();
+        const auto elapsed =
+            std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
+        if (elapsed.count() > flash_speed)
+        {
+            current_texture++;
+            start = now;
         }
 
         // Update position and rotation based on key states
@@ -192,8 +256,9 @@ int main()
         SDL_RenderClear(w.get_renderer()->get_sdl2_renderer_handle());
 
         // Render the texture
-        SDL_RenderCopyEx(w.get_renderer()->get_sdl2_renderer_handle(), texture,
-                         nullptr, &rect, rot, nullptr, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(w.get_renderer()->get_sdl2_renderer_handle(),
+                         texture->get_sdl2_texture_handle(), nullptr, &rect,
+                         rot, nullptr, SDL_FLIP_NONE);
 
         // Render the texture
         SDL_RenderPresent(w.get_renderer()->get_sdl2_renderer_handle());
