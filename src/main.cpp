@@ -21,28 +21,22 @@ int main()
 
     // Load the texture for the background
     linden::graphics::SDL2ImageTexture t_bg(*w.get_renderer(), "assets/bg.jpg");
-    SDL_Texture* texture_bg = t_bg.get_sdl2_texture_handle();
 
     // Load the texture for the car
     linden::graphics::SDL2ImageTexture t_image(*w.get_renderer(),
                                                "assets/car.png");
-    SDL_Texture* texture_image = t_image.get_sdl2_texture_handle();
 
     // Main loop flag
     bool quit = false;
 
-    // Event handler
-    SDL_Event e;
+    // Main character render options
+    linden::graphics::TextureRenderOptions car_render_options = {
+        .position = {w.get_window_size().width / 4,
+                     w.get_window_size().height / 4},
+        .size = {348 / 3, 685 / 3},
+        .angle = 0};
 
-    SDL_Rect rect;
-    rect.x = w.get_window_size().width / 2;
-    rect.y = w.get_window_size().height / 2;
-    rect.w = 348 / 3;
-    rect.h = 685 / 3;
-    double rot = 0;
     uint32_t speed = 15;
-    uint8_t alpha = 255;
-    uint32_t flash_speed = 500;
 
     // Define boolean flags for key states
     bool up_pressed = false;
@@ -52,8 +46,10 @@ int main()
     bool space_pressed = false;
 
     uint32_t current_texture = 0;
+    uint8_t alpha = 0xff;
 
-    auto start = std::chrono::high_resolution_clock::now();
+    // Event handler
+    SDL_Event e;
 
     while (!quit)
     {
@@ -88,7 +84,6 @@ int main()
                         {
                             space_pressed = true;
                             speed *= 3;
-                            flash_speed /= 5;
                             std::cout << "DOWWWNNN" << std::endl;
                         }
                         break;
@@ -132,7 +127,6 @@ int main()
                         if (space_pressed)
                         {
                             speed /= 3;
-                            flash_speed *= 5;
                             std::cout << "UP" << std::endl;
                             space_pressed = false;
                         }
@@ -141,37 +135,36 @@ int main()
             }
         }
 
-        const auto now = std::chrono::high_resolution_clock::now();
-        const auto elapsed =
-            std::chrono::duration_cast<std::chrono::milliseconds>(now - start);
-        if (elapsed.count() > flash_speed)
-        {
-            current_texture++;
-            start = now;
-        }
-
         // Update position and rotation based on key states
         if (up_pressed)
         {
-            const int new_x = rect.x + (speed * cos((rot - 90) * M_PI / 180.0));
-            const int new_y = rect.y + (speed * sin((rot - 90) * M_PI / 180.0));
-            rect.x = new_x;
-            rect.y = new_y;
+            const int new_x =
+                car_render_options.position.x +
+                (speed * cos((car_render_options.angle - 90) * M_PI / 180.0));
+            const int new_y =
+                car_render_options.position.y +
+                (speed * sin((car_render_options.angle - 90) * M_PI / 180.0));
+            car_render_options.position.x = new_x;
+            car_render_options.position.y = new_y;
         }
         if (down_pressed)
         {
-            const int new_x = rect.x - (speed * cos((rot - 90) * M_PI / 180.0));
-            const int new_y = rect.y - (speed * sin((rot - 90) * M_PI / 180.0));
-            rect.x = new_x;
-            rect.y = new_y;
+            const int new_x =
+                car_render_options.position.x -
+                (speed * cos((car_render_options.angle - 90) * M_PI / 180.0));
+            const int new_y =
+                car_render_options.position.y -
+                (speed * sin((car_render_options.angle - 90) * M_PI / 180.0));
+            car_render_options.position.x = new_x;
+            car_render_options.position.y = new_y;
         }
         if (left_pressed)
         {
-            rot -= 5;
+            car_render_options.angle -= 9;
         }
         if (right_pressed)
         {
-            rot += 5;
+            car_render_options.angle += 9;
         }
 
         // Clear screen
@@ -181,13 +174,7 @@ int main()
         w.get_renderer()->render_texture(t_bg);
 
         // Render the texture
-        w.get_renderer()->render_texture(t_image, {true,
-                                                   {rect.x, rect.y},
-                                                   {rect.w, rect.h},
-                                                   rot,
-                                                   {rect.w / 2, rect.h / 2},
-                                                   false,
-                                                   false});
+        w.get_renderer()->render_texture(t_image, car_render_options);
 
         // Render the texture
         w.get_renderer()->render();
