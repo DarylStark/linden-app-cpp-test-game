@@ -30,30 +30,30 @@ int main()
     {
         for (int32_t y = 0; y < 12; y++)
         {
-            t.set_pixel({x, y}, {255, 255, 255, 0});
+            t.set_pixel({x, y}, {0, 0, 0, 0});
         }
     }
 
-    t.set_pixel({0, 2}, {0, 0, 0, 255});
-    t.set_pixel({6, 2}, {0, 0, 0, 255});
-    t.set_pixel({0, 3}, {0, 0, 0, 255});
-    t.set_pixel({6, 3}, {0, 0, 0, 255});
-    t.set_pixel({0, 8}, {0, 0, 0, 255});
-    t.set_pixel({6, 8}, {0, 0, 0, 255});
-    t.set_pixel({0, 9}, {0, 0, 0, 255});
-    t.set_pixel({6, 9}, {0, 0, 0, 255});
+    t.set_pixel({0, 2}, {0, 0x66, 0, 255});
+    t.set_pixel({6, 2}, {0, 0x66, 0, 255});
+    t.set_pixel({0, 3}, {0, 0x66, 0, 255});
+    t.set_pixel({6, 3}, {0, 0x66, 0, 255});
+    t.set_pixel({0, 8}, {0, 0x66, 0, 255});
+    t.set_pixel({6, 8}, {0, 0x66, 0, 255});
+    t.set_pixel({0, 9}, {0, 0x66, 0, 255});
+    t.set_pixel({6, 9}, {0, 0x66, 0, 255});
 
     for (int32_t y = 0; y <= 11; y++)
     {
-        t.set_pixel({1, y}, {0, 0, 0, 255});
-        t.set_pixel({2, y}, {0, 0, 0, 255});
-        t.set_pixel({3, y}, {0, 0, 0, 255});
-        t.set_pixel({4, y}, {0, 0, 0, 255});
-        t.set_pixel({5, y}, {0, 0, 0, 255});
+        t.set_pixel({1, y}, {0, 0x66, 0, 128});
+        t.set_pixel({2, y}, {0, 0x66, 0, 128});
+        t.set_pixel({3, y}, {0, 0x66, 0, 128});
+        t.set_pixel({4, y}, {0, 0x66, 0, 128});
+        t.set_pixel({5, y}, {0, 0x66, 0, 128});
     }
 
-    t.set_pixel({1, 0}, {255, 255, 255, 255});
-    t.set_pixel({5, 0}, {255, 255, 255, 255});
+    t.set_pixel({1, 0}, {0, 0, 0, 0});
+    t.set_pixel({5, 0}, {0, 0, 0, 0});
 
     t.unlock();
 
@@ -69,7 +69,7 @@ int main()
     rect.w = 70;
     rect.h = 120;
     int32_t rot = 0;
-    uint32_t speed = 10;
+    uint32_t speed = 15;
 
     // Define boolean flags for key states
     bool up_pressed = false;
