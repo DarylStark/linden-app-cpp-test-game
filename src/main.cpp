@@ -7,6 +7,7 @@
 
 #include <array>
 #include <iostream>
+#include <map>
 
 int main()
 {
@@ -15,41 +16,29 @@ int main()
     // Create a window
     linden::graphics::SDL2Window w = sdl2.create_window(
         "SDL2 Basic Example", {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED},
-        {1024 * 2, 1024 * 2});
+        {1920, 1080});
 
-    SDL_Window* window = w.get_sdl2_window_handle();
-
-    // Load the texture for the background
-    linden::graphics::SDL2ImageTexture t_bg(*w.get_renderer(), "assets/bg.jpg");
-
-    // Load the texture for the car
-    linden::graphics::SDL2ImageTexture t_image(*w.get_renderer(),
-                                               "assets/car.png");
+    // Load foliage texture
+    linden::graphics::SDL2ImageTexture foliage_texture(*w.get_renderer(),
+                                                       "assets/foliage.png");
+    std::map<std::string, std::shared_ptr<linden::graphics::SDL2Texture>>
+        textures;
+    textures["tree1"] =
+        foliage_texture.create_sub_texture({478, 0}, {102, 287});
+    textures["car"] = std::make_shared<linden::graphics::SDL2ImageTexture>(
+        *w.get_renderer(), "assets/car.png");
 
     // Main loop flag
     bool quit = false;
 
-    // Main character render options
-    linden::graphics::TextureRenderOptions car_render_options = {
-        .position = {w.get_window_size().width / 4,
-                     w.get_window_size().height / 4},
-        .size = {348 / 3, 685 / 3},
-        .angle = 0};
-
-    uint32_t speed = 15;
-
-    // Define boolean flags for key states
-    bool up_pressed = false;
-    bool down_pressed = false;
-    bool left_pressed = false;
-    bool right_pressed = false;
-    bool space_pressed = false;
-
-    uint32_t current_texture = 0;
-    uint8_t alpha = 0xff;
-
     // Event handler
     SDL_Event e;
+
+    int32_t foliage_start_x = 100;
+
+    linden::graphics::TextureRenderOptions car_options = {
+        .position = {50, 780}, .rotation_center = {0, 0}, .scale = 8};
+    int32_t speed = 0;
 
     while (!quit)
     {
@@ -59,122 +48,66 @@ int main()
         while (SDL_PollEvent(&e) != 0)
         {
             // User requests quit
-            if (e.type == SDL_QUIT)
-            {
-                quit = true;
-            }
-            else if (e.type == SDL_KEYDOWN)
+            if (e.type == SDL_QUIT) quit = true;
+            if (e.type == SDL_KEYDOWN)
             {
                 switch (e.key.keysym.sym)
                 {
-                    case SDLK_UP:
-                        up_pressed = true;
-                        break;
-                    case SDLK_DOWN:
-                        down_pressed = true;
-                        break;
                     case SDLK_LEFT:
-                        left_pressed = true;
-                        break;
-                    case SDLK_RIGHT:
-                        right_pressed = true;
-                        break;
-                    case SDLK_SPACE:
-                        if (!space_pressed)
+                        if (speed > 0)
                         {
-                            space_pressed = true;
-                            speed *= 3;
-                            std::cout << "DOWWWNNN" << std::endl;
+                            car_options.angle = 3;
+                            speed -= 5;
+                            if (speed < 0) speed = 0;
+                        }
+                        else
+                        {
+                            speed -= 5;
+                            if (speed < -20) speed = -20;
                         }
                         break;
-                    case SDLK_ESCAPE:
-                        quit = true;
+                    case SDLK_RIGHT:
+                        speed += 5;
+                        if (speed > 180) speed = 180;
+                        car_options.angle = -3;
                         break;
-                    case SDLK_MINUS:
-                        if (alpha > 10)
-                            alpha -= 10;
-                        else
-                            alpha = 0;
-                        t_image.set_alpha(alpha);
-                        break;
-                    case SDLK_EQUALS:
-                        if (alpha < 255 - 10)
-                            alpha += 10;
-                        else
-                            alpha = 255;
-                        t_image.set_alpha(alpha);
+                    default:
                         break;
                 }
             }
-            // Key release events
-            else if (e.type == SDL_KEYUP)
+            if (e.type == SDL_KEYUP)
             {
                 switch (e.key.keysym.sym)
                 {
-                    case SDLK_UP:
-                        up_pressed = false;
-                        break;
-                    case SDLK_DOWN:
-                        down_pressed = false;
-                        break;
-                    case SDLK_LEFT:
-                        left_pressed = false;
-                        break;
                     case SDLK_RIGHT:
-                        right_pressed = false;
-                        break;
-                    case SDLK_SPACE:
-                        if (space_pressed)
-                        {
-                            speed /= 3;
-                            std::cout << "UP" << std::endl;
-                            space_pressed = false;
-                        }
+                    case SDLK_LEFT:
+                        car_options.angle = 0;
                         break;
                 }
             }
         }
 
-        // Update position and rotation based on key states
-        if (up_pressed)
+        foliage_start_x -= speed;
+        if (foliage_start_x > 100)
         {
-            const int new_x =
-                car_render_options.position.x +
-                (speed * cos((car_render_options.angle - 90) * M_PI / 180.0));
-            const int new_y =
-                car_render_options.position.y +
-                (speed * sin((car_render_options.angle - 90) * M_PI / 180.0));
-            car_render_options.position.x = new_x;
-            car_render_options.position.y = new_y;
+            foliage_start_x = 100;
+            speed = 0;
         }
-        if (down_pressed)
-        {
-            const int new_x =
-                car_render_options.position.x -
-                (speed * cos((car_render_options.angle - 90) * M_PI / 180.0));
-            const int new_y =
-                car_render_options.position.y -
-                (speed * sin((car_render_options.angle - 90) * M_PI / 180.0));
-            car_render_options.position.x = new_x;
-            car_render_options.position.y = new_y;
-        }
-        if (left_pressed)
-        {
-            car_render_options.angle -= 9;
-        }
-        if (right_pressed)
-        {
-            car_render_options.angle += 9;
-        }
+        std::cout << speed;
 
         // Clear screen
-        w.get_renderer()->clear();
+        w.get_renderer()->clear({0, 0x44, 0, 0xff});
 
-        // Set background
-        w.get_renderer()->render_texture(t_bg);
+        // Render the foliage
+        w.get_renderer()->render_texture(*textures.at("tree1"),
+                                         {.position = {foliage_start_x, 500}});
+        w.get_renderer()->render_texture(
+            *textures.at("tree1"), {.position = {foliage_start_x + 152, 480}});
+        w.get_renderer()->render_texture(
+            *textures.at("tree1"), {.position = {foliage_start_x + 302, 520}});
 
-        // Render the texture
-        w.get_renderer()->render_texture(t_image, car_render_options);
+        // Render the car
+        w.get_renderer()->render_texture(*textures.at("car"), car_options);
 
         // Render the texture
         w.get_renderer()->render();
