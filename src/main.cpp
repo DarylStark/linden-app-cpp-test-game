@@ -36,8 +36,16 @@ int main()
 
     int32_t foliage_start_x = 100;
 
+    linden::graphics::Position rotate_center_accelerate = {
+        0, textures["car"]->get_size().height - 1};
+    linden::graphics::Position rotate_center_deaccelerate = {
+        textures["car"]->get_size().width - 1,
+        textures["car"]->get_size().height - 1};
+
     linden::graphics::TextureRenderOptions car_options = {
-        .position = {50, 780}, .rotation_center = {0, 0}, .scale = 8};
+        .position = {50, 780},
+        .rotation_center = rotate_center_accelerate,
+        .scale = 8};
     int32_t speed = 0;
 
     while (!quit)
@@ -57,17 +65,15 @@ int main()
                         if (speed > 0)
                         {
                             car_options.angle = 3;
+                            car_options.rotation_center =
+                                rotate_center_deaccelerate;
                             speed -= 5;
                             if (speed < 0) speed = 0;
-                        }
-                        else
-                        {
-                            speed -= 5;
-                            if (speed < -20) speed = -20;
                         }
                         break;
                     case SDLK_RIGHT:
                         speed += 5;
+                        car_options.rotation_center = rotate_center_accelerate;
                         if (speed > 180) speed = 180;
                         car_options.angle = -3;
                         break;
