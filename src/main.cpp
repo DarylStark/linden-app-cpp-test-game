@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <linden_graphics/sdl2.h>
+#include <linden_graphics/sdl2_eventbus.h>
 #include <linden_graphics/sdl2_image_texture.h>
 #include <linden_graphics/sdl2_target_texture.h>
 #include <linden_graphics/sdl2_texture.h>
@@ -72,64 +73,54 @@ int main()
     uint8_t lane = 0;
     bool in_rear = false;
 
+    // Eventbus
+    linden::graphics::SDL2EventBus event_bus;
+    const linden::graphics::SDL2EventCallback left_down =
+        [&speed, &car_options, &rotate_center_deaccelerate](const SDL_Event& e)
+    {
+        std::cout << "Left down" << std::endl;
+        if (speed > 0)
+        {
+            car_options.angle = 3;
+            car_options.rotation_center = rotate_center_deaccelerate;
+            speed -= 5;
+            if (speed < 0) speed = 0;
+        }
+    };
+    const linden::graphics::SDL2EventCallback right_down =
+        [&speed, &car_options, &rotate_center_accelerate](const SDL_Event& e)
+    {
+        std::cout << "Right down" << std::endl;
+        speed += 1;
+        car_options.rotation_center = rotate_center_accelerate;
+        if (speed > 180) speed = 180;
+        car_options.angle = -3;
+    };
+    const linden::graphics::SDL2EventCallback up =
+        [&car_options](const SDL_Event& e) { car_options.angle = 0; };
+    const auto change_lane = [&lane, &speed](const SDL_Event& e)
+    {
+        if (speed == 0) return;
+        if (lane == 0)
+            lane = 1;
+        else
+            lane = 0;
+    };
+    event_bus.on_specific_key_down(SDLK_LEFT, left_down);
+    event_bus.on_specific_key_down(SDLK_RIGHT, right_down);
+    event_bus.on_specific_key_up(SDLK_LEFT, up);
+    event_bus.on_specific_key_up(SDLK_RIGHT, up);
+    event_bus.on_specific_key_up(SDLK_UP, change_lane);
+    event_bus.on_specific_key_up(SDLK_DOWN, change_lane);
+
+    event_bus.on_window_close([&quit](const SDL_Event&) { quit = true; });
+
     while (!quit)
     {
-        linden::utils::ScopedTimer timer;
+        // linden::utils::ScopedTimer timer;
         linden::utils::FrameRateLimiter limiter(60);
 
-        while (SDL_PollEvent(&e) != 0)
-        {
-            // User requests quit
-            if (e.type == SDL_QUIT) quit = true;
-            if (e.type == SDL_KEYDOWN)
-            {
-                switch (e.key.keysym.sym)
-                {
-                    case SDLK_LEFT:
-                        if (speed > 0)
-                        {
-                            car_options.angle = 3;
-                            car_options.rotation_center =
-                                rotate_center_deaccelerate;
-                            speed -= 5;
-                            if (speed < 0) speed = 0;
-                        }
-                        break;
-                    case SDLK_RIGHT:
-                        speed += 1;
-                        car_options.rotation_center = rotate_center_accelerate;
-                        if (speed > 180) speed = 180;
-                        car_options.angle = -3;
-                        break;
-                    case SDLK_UP:
-                        if (speed > 0) lane = 1;
-                        break;
-                    case SDLK_DOWN:
-                        if (speed > 0) lane = 0;
-                        break;
-                    case SDLK_SPACE:
-                        if (speed == 0)
-                        {
-                            in_rear = !in_rear;
-                            std::cout << "in_rear: " << std::boolalpha
-                                      << in_rear << std::endl;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if (e.type == SDL_KEYUP)
-            {
-                switch (e.key.keysym.sym)
-                {
-                    case SDLK_RIGHT:
-                    case SDLK_LEFT:
-                        car_options.angle = 0;
-                        break;
-                }
-            }
-        }
+        event_bus.handle_sdl_events();
 
         level_start_x -= speed;
         if (level_start_x > 100)
@@ -137,7 +128,6 @@ int main()
             level_start_x = 100;
             speed = 0;
         }
-        std::cout << speed;
 
         // Clear screen
         w.get_renderer()->clear({0, 0x44, 0, 0xff});
