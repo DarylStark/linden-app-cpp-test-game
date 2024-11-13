@@ -15,6 +15,8 @@
 #include <iostream>
 #include <map>
 
+#include "resource_manager/texture_manager.h"
+
 int main()
 {
     linden::graphics::SDL2 sdl2;
@@ -24,36 +26,31 @@ int main()
         "SDL2 Basic Example", {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED},
         {1920, 1080});
 
-    // Load foliage texture
-    linden::graphics::SDL2ImageTexture foliage_texture(*w.get_renderer(),
-                                                       "assets/foliage.png");
-    linden::graphics::SDL2ImageTexture car_texture(*w.get_renderer(),
-                                                   "assets/car.png");
-    std::map<std::string, std::shared_ptr<linden::graphics::SDL2Texture>> trees;
-    trees["tree_04"] = std::make_shared<linden::graphics::SDL2TargetTexture>(
-        *w.get_renderer(), foliage_texture,
-        linden::graphics::Position({478, 0}),
-        linden::graphics::Size({102, 287}));
-    trees["tree_10"] = std::make_shared<linden::graphics::SDL2TargetTexture>(
-        *w.get_renderer(), foliage_texture,
-        linden::graphics::Position({0, 403}),
-        linden::graphics::Size({151, 211}));
+    linden::test_game::TextureManager rm(*w.get_renderer());
+
+    // Load the texture for the car
+    rm.add_texture_from_file("car", "assets/car.png");
+
+    // Load the texture for the foliage
+    rm.add_texture_from_file("foliage", "assets/foliage.png");
+    rm.add_texture_from_spritesheet("tree_04", "foliage", {478, 0}, {102, 287});
+    rm.add_texture_from_spritesheet("tree_10", "foliage", {0, 403}, {151, 211});
 
     // Create the scene
     linden::graphics::SDL2TargetTexture scene(*w.get_renderer(), {5000, 300});
-    scene.add_texture(*trees["tree_04"], {0, 0}, trees["tree_04"]->get_size(),
-                      {100, 20}, trees["tree_04"]->get_size());
-    scene.add_texture(*trees["tree_04"], {0, 0}, trees["tree_04"]->get_size(),
-                      {252, 0}, trees["tree_04"]->get_size());
-    scene.add_texture(*trees["tree_04"], {0, 0}, trees["tree_04"]->get_size(),
-                      {402, 40}, trees["tree_04"]->get_size());
-    scene.add_texture(*trees["tree_10"], {0, 0}, trees["tree_10"]->get_size(),
-                      {542, 60}, trees["tree_10"]->get_size());
+    scene.add_texture(*rm.get("tree_04"), {0, 0}, rm.get("tree_04")->get_size(),
+                      {100, 20}, rm.get("tree_04")->get_size());
+    scene.add_texture(*rm.get("tree_04"), {0, 0}, rm.get("tree_04")->get_size(),
+                      {252, 0}, rm.get("tree_04")->get_size());
+    scene.add_texture(*rm.get("tree_04"), {0, 0}, rm.get("tree_04")->get_size(),
+                      {402, 40}, rm.get("tree_04")->get_size());
+    scene.add_texture(*rm.get("tree_10"), {0, 0}, rm.get("tree_10")->get_size(),
+                      {542, 60}, rm.get("tree_10")->get_size());
 
-    scene.add_texture(*trees["tree_10"], {0, 0}, trees["tree_10"]->get_size(),
-                      {1942, 60}, trees["tree_10"]->get_size());
-    scene.add_texture(*trees["tree_04"], {0, 0}, trees["tree_04"]->get_size(),
-                      {2542, 40}, trees["tree_04"]->get_size());
+    scene.add_texture(*rm.get("tree_10"), {0, 0}, rm.get("tree_10")->get_size(),
+                      {1942, 60}, rm.get("tree_10")->get_size());
+    scene.add_texture(*rm.get("tree_04"), {0, 0}, rm.get("tree_04")->get_size(),
+                      {2542, 40}, rm.get("tree_04")->get_size());
 
     // Main loop flag
     bool quit = false;
@@ -64,9 +61,10 @@ int main()
     int32_t level_start_x = 100;
 
     linden::graphics::Position rotate_center_accelerate = {
-        0, car_texture.get_size().height - 1};
+        0, rm.get("car")->get_size().height - 1};
     linden::graphics::Position rotate_center_deaccelerate = {
-        car_texture.get_size().width - 1, car_texture.get_size().height - 1};
+        rm.get("car")->get_size().width - 1,
+        rm.get("car")->get_size().height - 1};
 
     linden::graphics::TextureRenderOptions car_options = {
         .position = {50, 830},
@@ -172,16 +170,16 @@ int main()
         {
             SDL_RenderDrawLine(
                 w.get_renderer()->get_sdl2_renderer_handle(),
-                (car_texture.get_size().width * 8) + 60 + x + level_start_x,
+                (rm.get("car")->get_size().width * 8) + 60 + x + level_start_x,
                 760,
-                (car_texture.get_size().width * 8) + -20 + x + level_start_x,
+                (rm.get("car")->get_size().width * 8) + -20 + x + level_start_x,
                 770 + 190);
 
             SDL_RenderDrawLine(
                 w.get_renderer()->get_sdl2_renderer_handle(),
-                (car_texture.get_size().width * 8) + 80 + x + level_start_x,
+                (rm.get("car")->get_size().width * 8) + 80 + x + level_start_x,
                 760,
-                (car_texture.get_size().width * 8) + 00 + x + level_start_x,
+                (rm.get("car")->get_size().width * 8) + 00 + x + level_start_x,
                 770 + 190);
         }
 
@@ -191,7 +189,7 @@ int main()
 
         // Render the car
         car_options.position.y = 830 - (95 * lane);
-        w.get_renderer()->render_texture(car_texture, car_options);
+        w.get_renderer()->render_texture(*rm.get("car"), car_options);
 
         // Render the text
         text_texture.set_text("Speed: " + std::to_string(speed));
