@@ -140,13 +140,13 @@ int main()
 
         // Draw the road
         SDL_SetRenderDrawColor(w.get_renderer()->get_sdl2_renderer_handle(),
-                               0x55, 0x55, 0x55, 0xff);
+                               169, 168, 184, 0xff);
         SDL_Rect rect = {0, 770, 1920, 190};
         SDL_RenderFillRect(w.get_renderer()->get_sdl2_renderer_handle(), &rect);
 
         // Draw the lines outside of the road
         SDL_SetRenderDrawColor(w.get_renderer()->get_sdl2_renderer_handle(),
-                               0xaa, 0xaa, 0xaa, 0xff);
+                               240, 245, 255, 0xff);
         for (uint32_t y = 0; y < 2; y++)
             SDL_RenderDrawLine(w.get_renderer()->get_sdl2_renderer_handle(), 0,
                                548 + y, 1920, 548 + y);
