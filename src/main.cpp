@@ -46,7 +46,6 @@ int main()
                       {402, 40}, rm.get("tree_04")->get_size());
     scene.add_texture(*rm.get("tree_10"), {0, 0}, rm.get("tree_10")->get_size(),
                       {542, 60}, rm.get("tree_10")->get_size());
-
     scene.add_texture(*rm.get("tree_10"), {0, 0}, rm.get("tree_10")->get_size(),
                       {1942, 60}, rm.get("tree_10")->get_size());
     scene.add_texture(*rm.get("tree_04"), {0, 0}, rm.get("tree_04")->get_size(),
