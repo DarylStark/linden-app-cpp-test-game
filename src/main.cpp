@@ -1,8 +1,11 @@
 #include <SDL2/SDL.h>
+#include <SDL_ttf.h>
 #include <linden_graphics/sdl2.h>
 #include <linden_graphics/sdl2_eventbus.h>
+#include <linden_graphics/sdl2_font.h>
 #include <linden_graphics/sdl2_image_texture.h>
 #include <linden_graphics/sdl2_target_texture.h>
+#include <linden_graphics/sdl2_text_texture.h>
 #include <linden_graphics/sdl2_texture.h>
 #include <linden_graphics/sdl2_window.h>
 #include <linden_utils/frame_rate_limiter.h>
@@ -115,6 +118,11 @@ int main()
 
     event_bus.on_window_close([&quit](const SDL_Event&) { quit = true; });
 
+    // Text rendering
+    linden::graphics::SDL2Font l_font("assets/RobotoMono-Regular.ttf", 36);
+    linden::graphics::SDL2TextTexture text_texture(
+        *w.get_renderer(), "Hello", l_font, {255, 255, 255, 255});
+
     while (!quit)
     {
         linden::utils::ScopedTimer timer;
@@ -184,6 +192,13 @@ int main()
         // Render the car
         car_options.position.y = 830 - (95 * lane);
         w.get_renderer()->render_texture(car_texture, car_options);
+
+        // Render the text
+        text_texture.set_text("Speed: " + std::to_string(speed));
+        w.get_renderer()->render_texture(
+            text_texture,
+            {.position = {1920 - text_texture.get_size().width - 32,
+                          1080 - text_texture.get_size().height - 32}});
 
         // Render the texture
         w.get_renderer()->render();
