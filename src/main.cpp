@@ -1,5 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
+#include <linden/utils/frame_rate_limiter.h>
+#include <linden/utils/scoped_timer.h>
 #include <linden_graphics/sdl2.h>
 #include <linden_graphics/sdl2_eventbus.h>
 #include <linden_graphics/sdl2_font.h>
@@ -8,8 +10,6 @@
 #include <linden_graphics/sdl2_text_texture.h>
 #include <linden_graphics/sdl2_texture.h>
 #include <linden_graphics/sdl2_window.h>
-#include <linden_utils/frame_rate_limiter.h>
-#include <linden_utils/scoped_timer.h>
 
 #include <array>
 #include <iostream>
