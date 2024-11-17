@@ -25,7 +25,7 @@ namespace linden::test_game
     }
 
     void TextureManager::add_texture_from_spritesheet(
-        const std::string& name, const std::string& texture_spritesheet_name,
+        const std::string& texture_spritesheet_name, const std::string& name,
         const linden::graphics::Position position,
         const linden::graphics::Size size)
     {

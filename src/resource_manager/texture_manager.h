@@ -27,9 +27,8 @@ namespace linden::test_game
         void add_texture_from_file(const std::string& name,
                                    const std::string& path);
         void add_texture_from_spritesheet(
-            const std::string& name,
             const std::string& texture_spritesheet_name,
-            const linden::graphics::Position position,
+            const std::string& name, const linden::graphics::Position position,
             const linden::graphics::Size size);
 
         // Retrieving textures
