@@ -1,3 +1,63 @@
+
+
+#ifndef OLD_CODE
+
+#include <linden_graphics/sdl2_eventbus.h>
+
+#include "linden/sdl2/context.h"
+#include "linden/sdl2/image_sprite.h"
+#include "linden/utils/frame_rate_limiter.h"
+#include "linden/utils/scoped_timer.h"
+
+int main()
+{
+    // Context
+    linden::sdl2::Context context;
+
+    // Window
+    auto window = context.create_window(
+        "Hello World", {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED},
+        {1920, 1080});
+
+    // Image sprite
+    linden::sdl2::ImageSprite image_sprite(window.get_renderer(),
+                                           "assets/car.png");
+
+    // Event Bus (OLD CODE)
+    bool quit = false;
+    linden::graphics::SDL2EventBus event_bus;
+    event_bus.on_window_close([&quit](const SDL_Event&) { quit = true; });
+    uint16_t x = 0;
+
+    while (!quit)
+    {
+        linden::utils::ScopedTimer timer;
+        linden::utils::FrameRateLimiter limiter(120);
+
+        event_bus.handle_sdl_events();
+
+        window.get_renderer().set_draw_color({128, 64, 0, 128});
+        window.get_renderer().clear();
+
+        image_sprite.render({
+            .destination = {.position = {0, 0}, .size = {1920 / 2, 1080 / 2}},
+            .source = {.position = {0, 0}, .size = {200, 200}},
+            .rotation = {.angle = (x += 5) % 360,
+                         .center = {1920 / 4, 1080 / 4},
+                         .flip_horizontal = false,
+                         .flip_vertical = false},
+        });
+
+        window.get_renderer().present();
+    }
+
+    return 0;
+}
+
+#endif
+
+#ifdef OLD_CODE
+
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
 #include <linden/utils/frame_rate_limiter.h>
@@ -21,7 +81,6 @@
 #include "tile_grid/tile_grid.h"
 
 linden::test_game::LevelData level_1{.length_in_meters = 5000};
-
 int main()
 {
     linden::graphics::SDL2 sdl2;
@@ -222,3 +281,4 @@ int main()
 
     return 0;
 }
+#endif
