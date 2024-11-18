@@ -37,26 +37,9 @@ int main()
 
     {
         linden::sdl2::ScopedTarget scoped_target(bg);
-        bg.get_renderer_handle().set_draw_color({130, 206, 235, 0xff});
-        bg.get_renderer_handle().clear();
-
-        // Trees in the background
-        tree_10.render(
-            {.destination = {.position = {137, 356}, .size = {151, 211}},
-             .source = {.position = {0, 0}, .size = {151, 211}}});
-        tree_04.render(
-            {.destination = {.position = {75, 300}, .size = {102, 287}},
-             .source = {.position = {0, 0}, .size = {102, 287}}});
-
-        // Flowers on the side of the road
-        for (int32_t x = -21; x < 1920; x += 42)
-        {
-            linden::sdl2::SpriteFragment* obj = &tree_01;
-            if ((x + 21) % 84 == 0) obj = &tree_02;
-            obj->render(
-                {.destination = {.position = {x, 536}, .size = {42, 60}},
-                 .source = {.position = {0, 0}, .size = {42, 60}}});
-        }
+        tree_10.render({.destination = {.position = {100, 0}}});
+        tree_10.render({.destination = {.position = {0, 0}}});
+        tree_10.render({.destination = {.position = {200, 0}}});
     }
 
     // Event Bus (OLD CODE)
@@ -71,15 +54,9 @@ int main()
 
         event_bus.handle_sdl_events();
 
-        window.get_renderer().set_draw_color({128, 64, 0, 128});
         window.get_renderer().clear();
 
-        bg.render({.destination = {.position = {0, 0}, .size = {1920, 600}},
-                   .source = {.position = {0, 0}, .size = {1920, 600}}});
-        car.render({.destination = {.position = {1920 - 32 - 256, 620},
-                                    .size = {256, 104}},
-                    .source = {.position = {0, 0}, .size = {32, 13}},
-                    .rotation = {.flip_horizontal = true}});
+        bg.render({});
 
         window.get_renderer().present();
     }
