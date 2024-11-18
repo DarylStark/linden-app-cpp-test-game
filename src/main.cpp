@@ -1,4 +1,4 @@
-
+// #define OLD_CODE
 
 #ifndef OLD_CODE
 
@@ -6,6 +6,8 @@
 
 #include "linden/sdl2/context.h"
 #include "linden/sdl2/image_sprite.h"
+#include "linden/sdl2/scoped_target.h"
+#include "linden/sdl2/target_sprite.h"
 #include "linden/utils/frame_rate_limiter.h"
 #include "linden/utils/scoped_timer.h"
 
@@ -19,15 +21,32 @@ int main()
         "Hello World", {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED},
         {1920, 1080});
 
-    // Image sprite
-    linden::sdl2::ImageSprite image_sprite(window.get_renderer(),
-                                           "assets/car.png");
+    // Image sprites
+    linden::sdl2::ImageSprite car(window.get_renderer(), "assets/car.png");
+    linden::sdl2::ImageSprite foliage(window.get_renderer(),
+                                      "assets/foliage.png");
 
     // Event Bus (OLD CODE)
     bool quit = false;
     linden::graphics::SDL2EventBus event_bus;
     event_bus.on_window_close([&quit](const SDL_Event&) { quit = true; });
     uint16_t x = 0;
+
+    // Target sprite testing
+    linden::sdl2::TargetSprite bg(window.get_renderer(), {1920, 600});
+
+    {
+        linden::sdl2::ScopedTarget scoped_target(bg);
+        bg.get_renderer_handle().set_draw_color({130, 206, 235, 0xff});
+        bg.get_renderer_handle().clear();
+
+        foliage.render(
+            {.destination = {.position = {137, 356}, .size = {151, 211}},
+             .source = {.position = {0, 403}, .size = {151, 211}}});
+        foliage.render(
+            {.destination = {.position = {75, 300}, .size = {102, 287}},
+             .source = {.position = {478, 0}, .size = {102, 287}}});
+    }
 
     while (!quit)
     {
@@ -39,14 +58,10 @@ int main()
         window.get_renderer().set_draw_color({128, 64, 0, 128});
         window.get_renderer().clear();
 
-        image_sprite.render({
-            .destination = {.position = {0, 0}, .size = {1920 / 2, 1080 / 2}},
-            .source = {.position = {0, 0}, .size = {200, 200}},
-            .rotation = {.angle = (x += 5) % 360,
-                         .center = {1920 / 4, 1080 / 4},
-                         .flip_horizontal = false,
-                         .flip_vertical = false},
-        });
+        bg.render({.destination = {.position = {0, 0}, .size = {1920, 600}},
+                   .source = {.position = {0, 0}, .size = {1920, 600}}});
+        car.render({.destination = {.position = {32, 620}, .size = {256, 104}},
+                    .source = {.position = {0, 0}, .size = {32, 13}}});
 
         window.get_renderer().present();
     }
@@ -261,13 +276,10 @@ int main()
             {.position = {1920 - text_texture.get_size().width - 32,
                           1080 - text_texture.get_size().height - 32}});
 
-        w.get_renderer()->clear();
         // tg.get_tile(0, 0).add_texture(
         //     *game_assets.get("car"), {0, 0},
         //     game_assets.get("car")->get_size(), {0, 0},
         //     game_assets.get("car")->get_size() * 10);
-        tg.add_texture_to_tile(*game_assets.get("car"), {0, 0},
-                               game_assets.get("car")->get_size() * x++);
 
         w.get_renderer()->render_texture(tg.get_tile(0, 0), {.position{0, 0}});
         // w.get_renderer()->render_texture(tg.get_tile(1, 0),
