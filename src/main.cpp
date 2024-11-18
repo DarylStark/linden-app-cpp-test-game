@@ -2,14 +2,14 @@
 
 #ifndef OLD_CODE
 
+#include <linden/sdl2/context.h>
+#include <linden/sdl2/image_sprite.h>
+#include <linden/sdl2/scoped_target.h>
+#include <linden/sdl2/sprite_fragment.h>
+#include <linden/sdl2/target_sprite.h>
+#include <linden/utils/frame_rate_limiter.h>
+#include <linden/utils/scoped_timer.h>
 #include <linden_graphics/sdl2_eventbus.h>
-
-#include "linden/sdl2/context.h"
-#include "linden/sdl2/image_sprite.h"
-#include "linden/sdl2/scoped_target.h"
-#include "linden/sdl2/target_sprite.h"
-#include "linden/utils/frame_rate_limiter.h"
-#include "linden/utils/scoped_timer.h"
 
 int main()
 {
@@ -26,13 +26,13 @@ int main()
     linden::sdl2::ImageSprite foliage(window.get_renderer(),
                                       "assets/foliage.png");
 
-    // Event Bus (OLD CODE)
-    bool quit = false;
-    linden::graphics::SDL2EventBus event_bus;
-    event_bus.on_window_close([&quit](const SDL_Event&) { quit = true; });
-    uint16_t x = 0;
+    // Sprite fragments
+    linden::sdl2::SpriteFragment tree_01(foliage, {891, 650}, {42, 60});
+    linden::sdl2::SpriteFragment tree_02(foliage, {230, 766}, {42, 35});
+    linden::sdl2::SpriteFragment tree_04(foliage, {478, 0}, {102, 287});
+    linden::sdl2::SpriteFragment tree_10(foliage, {0, 403}, {151, 211});
 
-    // Target sprite testing
+    // Target sprite for background
     linden::sdl2::TargetSprite bg(window.get_renderer(), {1920, 600});
 
     {
@@ -40,13 +40,29 @@ int main()
         bg.get_renderer_handle().set_draw_color({130, 206, 235, 0xff});
         bg.get_renderer_handle().clear();
 
-        foliage.render(
+        // Trees in the background
+        tree_10.render(
             {.destination = {.position = {137, 356}, .size = {151, 211}},
-             .source = {.position = {0, 403}, .size = {151, 211}}});
-        foliage.render(
+             .source = {.position = {0, 0}, .size = {151, 211}}});
+        tree_04.render(
             {.destination = {.position = {75, 300}, .size = {102, 287}},
-             .source = {.position = {478, 0}, .size = {102, 287}}});
+             .source = {.position = {0, 0}, .size = {102, 287}}});
+
+        // Flowers on the side of the road
+        for (int32_t x = -21; x < 1920; x += 42)
+        {
+            linden::sdl2::SpriteFragment* obj = &tree_01;
+            if ((x + 21) % 84 == 0) obj = &tree_02;
+            obj->render(
+                {.destination = {.position = {x, 536}, .size = {42, 60}},
+                 .source = {.position = {0, 0}, .size = {42, 60}}});
+        }
     }
+
+    // Event Bus (OLD CODE)
+    bool quit = false;
+    linden::graphics::SDL2EventBus event_bus;
+    event_bus.on_window_close([&quit](const SDL_Event&) { quit = true; });
 
     while (!quit)
     {
@@ -60,8 +76,10 @@ int main()
 
         bg.render({.destination = {.position = {0, 0}, .size = {1920, 600}},
                    .source = {.position = {0, 0}, .size = {1920, 600}}});
-        car.render({.destination = {.position = {32, 620}, .size = {256, 104}},
-                    .source = {.position = {0, 0}, .size = {32, 13}}});
+        car.render({.destination = {.position = {1920 - 32 - 256, 620},
+                                    .size = {256, 104}},
+                    .source = {.position = {0, 0}, .size = {32, 13}},
+                    .rotation = {.flip_horizontal = true}});
 
         window.get_renderer().present();
     }
