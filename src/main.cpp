@@ -21,8 +21,13 @@ int main()
         "Hello World", {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED},
         {1920, 1080});
 
+    linden::sdl2::ImageSprite car1(window.get_renderer(),
+                                   "assets/not_found.png");
+
     // Image sprites
     linden::sdl2::ImageSprite car(window.get_renderer(), "assets/car.png");
+    linden::sdl2::ImageSprite mini(window.get_renderer(),
+                                   "assets/mini-full.png");
     linden::sdl2::ImageSprite foliage(window.get_renderer(),
                                       "assets/foliage.png");
 
@@ -57,6 +62,7 @@ int main()
         window.get_renderer().clear();
 
         bg.render({});
+        mini.render({});
 
         window.get_renderer().present();
     }
