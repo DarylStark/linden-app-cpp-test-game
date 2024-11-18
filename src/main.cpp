@@ -67,7 +67,7 @@ int main()
     while (!quit)
     {
         linden::utils::ScopedTimer timer;
-        linden::utils::FrameRateLimiter limiter(120);
+        linden::utils::FrameRateLimiter limiter(60);
 
         event_bus.handle_sdl_events();
 
