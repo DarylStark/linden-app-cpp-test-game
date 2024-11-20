@@ -42,9 +42,9 @@ int main()
 
     {
         linden::sdl2::ScopedTarget scoped_target(bg);
-        tree_10.render({.destination = {.position = {100, 0}}});
-        tree_10.render({.destination = {.position = {0, 0}}});
-        tree_10.render({.destination = {.position = {200, 0}}});
+        tree_10.render({.destination = {.position = {100, 600 - 211}}});
+        tree_10.render({.destination = {.position = {0, 600 - 211}}});
+        tree_10.render({.destination = {.position = {200, 600 - 211}}});
     }
 
     // Event Bus (OLD CODE)
@@ -59,12 +59,12 @@ int main()
 
         event_bus.handle_sdl_events();
 
-        window.get_renderer().clear();
+        window.clear();
 
         bg.render({});
-        mini.render({});
+        mini.render({.destination = {.position = {50, 500}}});
 
-        window.get_renderer().present();
+        window.present();
     }
 
     return 0;
