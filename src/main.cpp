@@ -7,6 +7,7 @@
 #include <linden/sdl2/scoped_target.h>
 #include <linden/sdl2/sprite_fragment.h>
 #include <linden/sdl2/target_sprite.h>
+#include <linden/sdl2/tile_grid.h>
 #include <linden/utils/frame_rate_limiter.h>
 #include <linden/utils/scoped_timer.h>
 #include <linden_graphics/sdl2_eventbus.h>
@@ -38,31 +39,46 @@ int main()
     linden::sdl2::SpriteFragment tree_10(foliage, {0, 403}, {151, 211});
 
     // Target sprite for background
-    linden::sdl2::TargetSprite bg(window.get_renderer(), {1920, 600});
+    // linden::sdl2::TargetSprite bg(window.get_renderer(), {1920, 600});
 
-    {
-        linden::sdl2::ScopedTarget scoped_target(bg);
-        tree_10.render({.destination = {.position = {100, 600 - 211}}});
-        tree_10.render({.destination = {.position = {0, 600 - 211}}});
-        tree_10.render({.destination = {.position = {200, 600 - 211}}});
-    }
+    // {
+    //     linden::sdl2::ScopedTarget scoped_target(bg);
+    //     tree_10.render({.destination = {.position = {100, 600 - 211}}});
+    //     tree_10.render({.destination = {.position = {0, 600 - 211}}});
+    //     tree_10.render({.destination = {.position = {200, 600 - 211}}});
+    // }
+
+    linden::sdl2::TileGrid bg(window.get_renderer(), {1920, 600}, {1300, 600});
+    bg.fill({0, 0, 0, 0});
+    bg.fill({0, 0, 0xff, 0xff}, 0, 0);
+    bg.fill({0, 0xff, 0, 0xff}, 1, 0);
+
+    // bg.add_renderable(tree_10, {.destination = {.position = {309, 108}}});
+    // bg.add_renderable(mini, {.destination = {.position = {309, 120}}});
+
+    // bg.fill({0x00, 0xff, 0, 0xff}, 1, 1);
+    // bg.fill({0x00, 0xff, 0x00, 0xff}, 2, 2);
+    window.set_draw_color({0, 0, 0, 0xff});
 
     // Event Bus (OLD CODE)
     bool quit = false;
     linden::graphics::SDL2EventBus event_bus;
     event_bus.on_window_close([&quit](const SDL_Event&) { quit = true; });
 
+    int32_t x = 0;
+
     while (!quit)
     {
         linden::utils::ScopedTimer timer;
-        linden::utils::FrameRateLimiter limiter(60);
+        linden::utils::FrameRateLimiter limiter(120);
 
         event_bus.handle_sdl_events();
 
         window.clear();
 
+        // mini.render({});
         bg.render({});
-        mini.render({.destination = {.position = {50, 500}}});
+        ++x;
 
         window.present();
     }
