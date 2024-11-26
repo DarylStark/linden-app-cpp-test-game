@@ -6,6 +6,7 @@
 #include <linden/sdl2/image_sprite.h>
 #include <linden/sdl2/scoped_target.h>
 #include <linden/sdl2/sprite_fragment.h>
+#include <linden/sdl2/sprite_sheet.h>
 #include <linden/sdl2/target_sprite.h>
 #include <linden/sdl2/tile_grid.h>
 #include <linden/utils/frame_rate_limiter.h>
@@ -29,36 +30,20 @@ int main()
     linden::sdl2::ImageSprite car(window.get_renderer(), "assets/car.png");
     linden::sdl2::ImageSprite mini(window.get_renderer(),
                                    "assets/mini-full.png");
-    linden::sdl2::ImageSprite foliage(window.get_renderer(),
-                                      "assets/foliage.png");
 
-    // Sprite fragments
-    linden::sdl2::SpriteFragment tree_01(foliage, {891, 650}, {42, 60});
-    linden::sdl2::SpriteFragment tree_02(foliage, {230, 766}, {42, 35});
-    linden::sdl2::SpriteFragment tree_04(foliage, {478, 0}, {102, 287});
-    linden::sdl2::SpriteFragment tree_10(foliage, {0, 403}, {151, 211});
+    // Sprite sheet for the foliage
+    linden::sdl2::SpriteSheet folioage(window.get_renderer(),
+                                       "assets/foliage.png");
+    folioage.set_sprite("tree_01", {891, 650}, {42, 60});
+    folioage.set_sprite("tree_04", {478, 0}, {102, 287});
+    folioage.set_sprite("tree_10", {0, 403}, {151, 211});
 
-    // Target sprite for background
-    // linden::sdl2::TargetSprite bg(window.get_renderer(), {1920, 600});
-
-    // {
-    //     linden::sdl2::ScopedTarget scoped_target(bg);
-    //     tree_10.render({.destination = {.position = {100, 600 - 211}}});
-    //     tree_10.render({.destination = {.position = {0, 600 - 211}}});
-    //     tree_10.render({.destination = {.position = {200, 600 - 211}}});
-    // }
-
-    linden::sdl2::TileGrid bg(window.get_renderer(), {1920, 600}, {1300, 600});
+    linden::sdl2::TileGrid bg(window.get_renderer(), {1920, 600}, {600, 600});
     bg.fill({0, 0, 0, 0});
-    bg.fill({0, 0, 0xff, 0xff}, 0, 0);
-    bg.fill({0, 0xff, 0, 0xff}, 1, 0);
-
-    // bg.add_renderable(tree_10, {.destination = {.position = {309, 108}}});
-    // bg.add_renderable(mini, {.destination = {.position = {309, 120}}});
-
-    // bg.fill({0x00, 0xff, 0, 0xff}, 1, 1);
-    // bg.fill({0x00, 0xff, 0x00, 0xff}, 2, 2);
-    window.set_draw_color({0, 0, 0, 0xff});
+    bg.add_renderable(folioage.get_sprite("tree_01"),
+                      {.destination = {.position = {0, 0}}});
+    bg.add_renderable(folioage.get_sprite("tree_10"),
+                      {.destination = {.position = {309, 108}}});
 
     // Event Bus (OLD CODE)
     bool quit = false;
